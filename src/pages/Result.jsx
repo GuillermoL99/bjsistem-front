@@ -171,28 +171,6 @@ export default function Result() {
               </div>
             )}
 
-            <div className="row">
-              <div className="label">OrderId</div>
-              <div className="value mono">{order.orderId}</div>
-            </div>
-
-            <div className="row">
-              <div className="label">PaymentId</div>
-              <div className="value mono">{order.paymentId || "-"}</div>
-            </div>
-
-            <div className="row">
-              <div className="label">Monto</div>
-              <div className="value">
-                {order.transaction_amount ?? "-"} {order.currency_id || ""}
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="label">Live mode</div>
-              <div className="value mono">{String(order.live_mode)}</div>
-            </div>
-
             <details style={{ marginTop: 14 }}>
               <summary>Ver JSON</summary>
               <pre className="mono">{JSON.stringify(order, null, 2)}</pre>
