@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "bjsistem-back-production.up.railway.app";
+const API_BASE = "bjsistem-back-production.up.railway.app"
 
 export async function checkout(payload) {
   const r = await fetch(`${API_BASE}/checkout`, {
