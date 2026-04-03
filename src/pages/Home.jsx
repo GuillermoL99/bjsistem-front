@@ -203,8 +203,8 @@ export default function Home() {
       // 2) preference con orderId
       const data = await createPreference({ orderId: c.orderId });
 
-      // en sandbox, preferimos sandbox_init_point
-      const url = data.sandbox_init_point || data.init_point;
+      // producción primero, sandbox como fallback
+      const url = data.init_point || data.sandbox_init_point;
       if (!url) throw new Error("No vino init_point/sandbox_init_point");
 
       window.location.href = url;
