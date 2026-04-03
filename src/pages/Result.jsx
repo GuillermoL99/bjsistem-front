@@ -170,11 +170,6 @@ export default function Result() {
                 <p style={{ fontSize: 13 }}>Esta página se actualiza automáticamente.</p>
               </div>
             )}
-
-            <details style={{ marginTop: 14 }}>
-              <summary>Ver JSON</summary>
-              <pre className="mono">{JSON.stringify(order, null, 2)}</pre>
-            </details>
           </>
         )}
 
