@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
+const API_BASE = import.meta.env.VITE_API_BASE || "bjsistem-back-production.up.railway.app";
 
 export async function getTickets() {
   const r = await fetch(`${API_BASE}/tickets`);
