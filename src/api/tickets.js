@@ -1,4 +1,4 @@
-const API_BASE = "bjsistem-back-production.up.railway.app"
+const API_BASE = "https://bjsistem-back-production.up.railway.app"
 
 export async function getTickets() {
   const r = await fetch(`${API_BASE}/tickets`);
