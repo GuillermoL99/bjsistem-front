@@ -179,7 +179,7 @@ function InfoModal({ onClose }) {
           tocá <strong>"Volver al sitio"</strong> para ser redirigido a tu QR y código de entrada.
         </p>
         <p style={{ margin: "0 0 20px", fontSize: 14, lineHeight: 1.6, color: "#333" }}>
-          También te enviaremos un <strong>código de respaldo a tu correo electrónico</strong> que 
+          También te enviaremos el <strong>QR y un código de respaldo a tu correo electrónico</strong> que 
           podrás usar como otra opción para validar tu entrada en el evento.
         </p>
         <button
