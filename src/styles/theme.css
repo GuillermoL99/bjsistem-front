@@ -286,6 +286,7 @@ select.input option{
   border-radius: var(--radius);
   background: var(--panel);
   box-shadow: none;
+  flex-wrap: wrap;
 }
 
 .adminTitle{
@@ -333,6 +334,52 @@ select.input option{
 
 .adminLogout{
   padding: 8px 12px;
+}
+
+/* Botón hamburguesa */
+.adminMenuToggle{
+  display: none;
+  background: rgba(0,0,0,.20);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: rgba(255,255,255,.82);
+  font-size: 22px;
+  padding: 6px 12px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.adminMenuToggle:hover{
+  background: rgba(255,255,255,.08);
+}
+
+/* Mobile: ocultar nav, mostrar hamburguesa */
+@media (max-width: 640px) {
+  .adminHeader{
+    position: relative;
+  }
+
+  .adminMenuToggle{
+    display: block;
+  }
+
+  .adminNav{
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .adminNav.open{
+    display: flex;
+  }
+
+  .adminNav .adminLink,
+  .adminNav .adminLogout{
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
 }
 
 .adminContent{

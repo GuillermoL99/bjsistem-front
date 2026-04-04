@@ -6,6 +6,7 @@ export default function AdminLayout() {
   const nav = useNavigate();
   const location = useLocation();
   const [me, setMe] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -45,6 +46,11 @@ export default function AdminLayout() {
     }
   }, [me, location.pathname, nav]);
 
+  // Cerrar menú al cambiar de ruta
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
   if (!me) {
     return (
       <div className="container">
@@ -82,7 +88,18 @@ export default function AdminLayout() {
             </div>
           </div>
 
-          <nav className="adminNav">
+          {/* Botón hamburguesa (solo mobile) */}
+          <button
+            type="button"
+            className="adminMenuToggle"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Menú"
+          >
+            {menuOpen ? "✕" : "☰"}
+          </button>
+
+          {/* Nav: siempre visible en desktop, desplegable en mobile */}
+          <nav className={`adminNav ${menuOpen ? "open" : ""}`}>
             <Link className="adminLink" to="/">
               Home
             </Link>
@@ -111,15 +128,15 @@ export default function AdminLayout() {
                   Usuarios
                 </Link>
                 <Link
-  className={
-    location.pathname.startsWith("/admin/clients")
-      ? "adminLink active"
-      : "adminLink"
-  }
-  to="/admin/clients"
->
-  Clientes
-</Link>
+                  className={
+                    location.pathname.startsWith("/admin/clients")
+                      ? "adminLink active"
+                      : "adminLink"
+                  }
+                  to="/admin/clients"
+                >
+                  Clientes
+                </Link>
               </>
             ) : (
               <Link
