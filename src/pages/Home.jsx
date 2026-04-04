@@ -9,7 +9,7 @@ import { getTickets } from "../api/tickets";
 import { checkout } from "../api/checkout";
 import { getToken } from "../lib/api";
 
-function TicketBuyCard({ t, paying, onPay }) {
+function TicketBuyCard({ t, paying, onPay, onShowInfo }) {
   const stock = Number(t.stock ?? 0);
   const maxQty = Math.max(0, Math.min(3, stock));
 
@@ -63,7 +63,10 @@ function TicketBuyCard({ t, paying, onPay }) {
 
       <div className="hr" />
 
-      <Button variant="primary" onClick={() => setOpen((v) => !v)} disabled={disabled}>
+      <Button variant="primary" onClick={() => {
+        if (!open) onShowInfo();
+        setOpen((v) => !v);
+      }} disabled={disabled}>
         {paying ? "Creando pago..." : stock > 0 ? (open ? "Cerrar" : "Pagar") : "Sin stock"}
       </Button>
 
@@ -200,7 +203,7 @@ function InfoModal({ onClose }) {
 export default function Home() {
   const nav = useNavigate();
 
-  const [showInfo, setShowInfo] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
   const [ticketsLoading, setTicketsLoading] = useState(true);
   const [ticketsError, setTicketsError] = useState(null);
   const [tickets, setTickets] = useState([]);
@@ -320,7 +323,7 @@ export default function Home() {
               }}
             >
               {tickets.map((t) => (
-                <TicketBuyCard key={t.id} t={t} paying={paying} onPay={pay} />
+                <TicketBuyCard key={t.id} t={t} paying={paying} onPay={pay} onShowInfo={() => setShowInfo(true)} />
               ))}
             </div>
           )}
