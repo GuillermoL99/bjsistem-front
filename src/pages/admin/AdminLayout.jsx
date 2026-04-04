@@ -40,7 +40,8 @@ export default function AdminLayout() {
     const isSuperAdminOnly =
       location.pathname.startsWith("/admin/users") ||
       location.pathname.startsWith("/admin/tickets") ||
-      location.pathname.startsWith("/admin/clients");
+      location.pathname.startsWith("/admin/clients") ||
+      location.pathname.startsWith("/admin/metrics");
     if (me.role !== "SUPER_ADMIN" && isSuperAdminOnly) {
       nav("/admin/scan", { replace: true });
     }
@@ -136,6 +137,16 @@ export default function AdminLayout() {
                   to="/admin/clients"
                 >
                   Clientes
+                </Link>
+                <Link
+                  className={
+                    location.pathname.startsWith("/admin/metrics")
+                      ? "adminLink active"
+                      : "adminLink"
+                  }
+                  to="/admin/metrics"
+                >
+                  Métricas
                 </Link>
               </>
             ) : (

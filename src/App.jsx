@@ -9,6 +9,7 @@ import ScanPage from "./pages/admin/ScanPage";
 import TicketsPage from "./pages/admin/ticketsPage";
 import ClientsPage from "./pages/admin/clientsPage";
 import ClientOrderDetailPage from "./pages/admin/ClientOrderDetailPage";
+import MetricsPage from "./pages/admin/MetricsPage";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="tickets" element={<TicketsPage />} />
         <Route path="clients" element={<ClientsPage />} />
         <Route path="clients/:orderId" element={<ClientOrderDetailPage />} />
+        <Route path="metrics" element={<MetricsPage />} />
       </Route>
 
       <Route path="/success" element={<Result />} />
