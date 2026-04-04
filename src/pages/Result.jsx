@@ -77,7 +77,6 @@ export default function Result() {
     <Layout>
       <Card
         title={order ? titleFromStatus(order.status) : "Verificando..."}
-        subtitle="Este estado sale del backend (webhook), no del redirect."
       >
         {error && (
           <div className="notice error" style={{ marginTop: 12 }}>
