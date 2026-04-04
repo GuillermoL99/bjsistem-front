@@ -164,10 +164,50 @@ export default function Result() {
               </div>
             )}
 
-            {order.status === "pending" && (
-              <div style={{ textAlign: "center", margin: "20px 0", color: "var(--muted)" }}>
-                <p>Esperando confirmación del pago...</p>
-                <p style={{ fontSize: 13 }}>Esta página se actualiza automáticamente.</p>
+            {(order.status === "pending" || order.status === "created") && (
+              <div style={{ textAlign: "center", margin: "20px 0" }}>
+                <p style={{ color: "var(--muted)" }}>Esperando confirmación del pago...</p>
+                <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 16 }}>Esta página se actualiza automáticamente.</p>
+
+                {(order.init_point || order.sandbox_init_point) && (
+                  <a
+                    href={order.init_point || order.sandbox_init_point}
+                    style={{
+                      display: "inline-block",
+                      padding: "10px 24px",
+                      background: "#1864ab",
+                      color: "#fff",
+                      borderRadius: 10,
+                      textDecoration: "none",
+                      fontWeight: 600,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Reintentar pago
+                  </a>
+                )}
+              </div>
+            )}
+
+            {(order.status === "rejected" || order.status === "cancelled") && (
+              <div style={{ textAlign: "center", margin: "20px 0" }}>
+                <p style={{ color: "var(--muted)", marginBottom: 16 }}>
+                  {order.status === "rejected" ? "El pago fue rechazado." : "El pago fue cancelado."}
+                </p>
+                <Link
+                  to="/"
+                  style={{
+                    display: "inline-block",
+                    padding: "10px 24px",
+                    background: "#1864ab",
+                    color: "#fff",
+                    borderRadius: 10,
+                    textDecoration: "none",
+                    fontWeight: 600,
+                  }}
+                >
+                  Volver a comprar
+                </Link>
               </div>
             )}
           </>
