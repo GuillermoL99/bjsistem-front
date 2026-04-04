@@ -1,5 +1,4 @@
 
-
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
@@ -8,6 +7,7 @@ import Button from "../components/Button";
 import { createPreference } from "../api/mp";
 import { getTickets } from "../api/tickets";
 import { checkout } from "../api/checkout";
+import { getToken } from "../lib/api";
 
 function TicketBuyCard({ t, paying, onPay }) {
   const stock = Number(t.stock ?? 0);
@@ -159,6 +159,7 @@ export default function Home() {
   const [error, setError] = useState(null);
 
   const [lastOrderId, setLastOrderId] = useState(null);
+  const isLoggedIn = !!getToken();
 
   useEffect(() => {
     setLastOrderId(localStorage.getItem("lastOrderId"));
@@ -232,6 +233,11 @@ export default function Home() {
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {isLoggedIn && (
+                <button className="btn" type="button" onClick={() => nav("/admin")}>
+                  Panel Admin
+                </button>
+              )}
               <button className="btn" type="button" onClick={loadTickets} disabled={ticketsLoading || paying}>
                 {ticketsLoading ? "Cargando..." : "Actualizar"}
               </button>
