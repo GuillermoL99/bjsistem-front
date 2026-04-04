@@ -83,6 +83,10 @@ export default function AdminLayout() {
           </div>
 
           <nav className="adminNav">
+            <Link className="adminLink" to="/">
+              Home
+            </Link>
+
             {me.role === "SUPER_ADMIN" ? (
               <>
                 <Link
