@@ -174,9 +174,13 @@ function InfoModal({ onClose }) {
           Asegurate de <strong>ingresar correctamente tus datos</strong> (nombre, email, DNI), 
           ya que serán utilizados para validar tu entrada en el evento.
         </p>
-        <p style={{ margin: "0 0 20px", fontSize: 14, lineHeight: 1.6, color: "#333" }}>
+        <p style={{ margin: "0 0 10px", fontSize: 14, lineHeight: 1.6, color: "#333" }}>
           Una vez que completes el pago en Mercado Pago, 
           tocá <strong>"Volver al sitio"</strong> para ser redirigido a tu QR y código de entrada.
+        </p>
+        <p style={{ margin: "0 0 20px", fontSize: 14, lineHeight: 1.6, color: "#333" }}>
+          También te enviaremos un <strong>código de respaldo a tu correo electrónico</strong> que 
+          podrás usar como otra opción para validar tu entrada en el evento.
         </p>
         <button
           onClick={onClose}
