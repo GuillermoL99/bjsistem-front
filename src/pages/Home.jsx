@@ -148,9 +148,55 @@ function TicketBuyCard({ t, paying, onPay }) {
   );
 }
 
+function InfoModal({ onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 1000,
+        background: "rgba(0,0,0,.55)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#fff", borderRadius: 16, padding: "28px 24px",
+          maxWidth: 420, width: "100%",
+          boxShadow: "0 8px 30px rgba(0,0,0,.25)",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ fontSize: 36, marginBottom: 8 }}>⚠️</div>
+        <h3 style={{ margin: "0 0 12px", fontSize: 18, color: "#1864ab" }}>Antes de comprar</h3>
+        <p style={{ margin: "0 0 10px", fontSize: 14, lineHeight: 1.6, color: "#333" }}>
+          Asegurate de <strong>ingresar correctamente tus datos</strong> (nombre, email, DNI), 
+          ya que serán utilizados para validar tu entrada en el evento.
+        </p>
+        <p style={{ margin: "0 0 20px", fontSize: 14, lineHeight: 1.6, color: "#333" }}>
+          Una vez que completes el pago en Mercado Pago, 
+          tocá <strong>"Volver al sitio"</strong> para ser redirigido a tu QR y código de entrada.
+        </p>
+        <button
+          onClick={onClose}
+          style={{
+            padding: "10px 32px", background: "#1864ab", color: "#fff",
+            border: "none", borderRadius: 10, fontSize: 15, fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          Entendido
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const nav = useNavigate();
 
+  const [showInfo, setShowInfo] = useState(true);
   const [ticketsLoading, setTicketsLoading] = useState(true);
   const [ticketsError, setTicketsError] = useState(null);
   const [tickets, setTickets] = useState([]);
@@ -222,6 +268,7 @@ export default function Home() {
 
   return (
     <Layout>
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
       <div className="grid" style={{ gridTemplateColumns: "1fr" }}>
         <Card>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
