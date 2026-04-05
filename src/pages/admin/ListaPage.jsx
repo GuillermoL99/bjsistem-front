@@ -70,7 +70,15 @@ function ListaPage() {
   return (
     <div className="card" style={{ maxWidth: 1100, margin: "32px auto" }}>
       <h2 style={{ marginBottom: 8 }}>Lista Free</h2>
-      <form onSubmit={handleSubmit} style={{ display: "flex", gap: 12, marginBottom: 18 }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: "flex",
+          gap: 12,
+          marginBottom: 18,
+          flexWrap: "wrap",
+        }}
+      >
         <input
           className="input"
           name="nombre"
@@ -101,7 +109,12 @@ function ListaPage() {
           disabled={loading}
           style={{ flex: 1 }}
         />
-        <button className="btn btnPrimary" type="submit" disabled={loading} style={{ minWidth: 140 }}>
+        <button
+          className="btn btnPrimary"
+          type="submit"
+          disabled={loading}
+          style={{ minWidth: 140, flex: "1 1 100%", maxWidth: 200 }}
+        >
           {loading ? "Agregando..." : "Agregar a la lista"}
         </button>
       </form>
@@ -111,56 +124,58 @@ function ListaPage() {
           placeholder="Buscar por nombre, apellido o DNI"
           value={busqueda}
           onChange={e => setBusqueda(e.target.value)}
-          style={{ width: "100%" }}
+          style={{ width: "100%", minWidth: 0 }}
         />
       </div>
       {error && <div className="notice error" style={{ marginTop: 8 }}>{error}</div>}
       {success && <div className="notice" style={{ color: "var(--accent2)", marginTop: 8 }}>{success}</div>}
-      <table className="table" style={{ marginTop: 16 }}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>DNI</th>
-            <th>Agregado por</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredPersonas.map((p, i) => (
-            <tr
-              key={p._id || i}
-              style={p.passed ? { background: "rgba(34,197,94,0.18)" } : {}}
-            >
-              <td>{i + 1}</td>
-              <td>{p.buyer_firstName}</td>
-              <td>{p.buyer_lastName}</td>
-              <td>{p.buyer_dni}</td>
-              <td>{p.addedBy || "-"}</td>
-              <td>
-                <button
-                  className={"btn" + (p.passed ? " btnPrimary" : "")}
-                  style={p.passed ? { background: "var(--accent2)", borderColor: "var(--accent2)", color: "#fff" } : {}}
-                  onClick={async () => {
-                    try {
-                      const res = await apiFetch(`/admin/lista/marcar/${p._id}`, {
-                        method: "PATCH",
-                        body: JSON.stringify({ passed: !p.passed }),
-                      });
-                      setPersonas(personas => personas.map(x => x._id === p._id ? { ...x, passed: res.order.passed } : x));
-                    } catch (e) {
-                      alert("Error al marcar/desmarcar");
-                    }
-                  }}
-                >
-                  {p.passed ? "Pasó" : "Marcar"}
-                </button>
-              </td>
+      <div style={{ width: "100%", overflowX: "auto", marginTop: 16 }}>
+        <table className="table" style={{ minWidth: 600 }}>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>DNI</th>
+              <th>Agregado por</th>
+              <th>Estado</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredPersonas.map((p, i) => (
+              <tr
+                key={p._id || i}
+                style={p.passed ? { background: "rgba(34,197,94,0.18)" } : {}}
+              >
+                <td>{i + 1}</td>
+                <td>{p.buyer_firstName}</td>
+                <td>{p.buyer_lastName}</td>
+                <td>{p.buyer_dni}</td>
+                <td>{p.addedBy || "-"}</td>
+                <td>
+                  <button
+                    className={"btn" + (p.passed ? " btnPrimary" : "")}
+                    style={p.passed ? { background: "var(--accent2)", borderColor: "var(--accent2)", color: "#fff" } : {}}
+                    onClick={async () => {
+                      try {
+                        const res = await apiFetch(`/admin/lista/marcar/${p._id}`, {
+                          method: "PATCH",
+                          body: JSON.stringify({ passed: !p.passed }),
+                        });
+                        setPersonas(personas => personas.map(x => x._id === p._id ? { ...x, passed: res.order.passed } : x));
+                      } catch (e) {
+                        alert("Error al marcar/desmarcar");
+                      }
+                    }}
+                  >
+                    {p.passed ? "Pasó" : "Marcar"}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
