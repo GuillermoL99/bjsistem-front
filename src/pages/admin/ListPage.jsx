@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Card from "../../components/Card";
+import Button from "../../components/Button";
 import { apiFetch } from "../../lib/api";
 
 export default function ListPage() {
@@ -9,6 +10,14 @@ export default function ListPage() {
   const [search, setSearch] = useState("");
   const [selectedEvent, setSelectedEvent] = useState("all");
   const [toggling, setToggling] = useState(null);
+  const [adding, setAdding] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+
+  // form agregar manual
+  const [addFirst, setAddFirst] = useState("");
+  const [addLast, setAddLast] = useState("");
+  const [addDni, setAddDni] = useState("");
+  const [addTicket, setAddTicket] = useState("");
 
   async function loadList() {
     setLoading(true);
@@ -44,6 +53,51 @@ export default function ListPage() {
       setErr(e?.data?.error || "toggle_failed");
     } finally {
       setToggling(null);
+    }
+  }
+
+  async function addPerson(e) {
+    e.preventDefault();
+    if (adding) return;
+    setAdding(true);
+    setErr("");
+    try {
+      await apiFetch("/admin/list", {
+        method: "POST",
+        body: JSON.stringify({
+          ticketId: addTicket,
+          firstName: addFirst.trim(),
+          lastName: addLast.trim(),
+          dni: addDni.trim(),
+        }),
+      });
+      setAddFirst("");
+      setAddLast("");
+      setAddDni("");
+      await loadList();
+    } catch (e) {
+      setErr(e?.data?.error || "add_failed");
+    } finally {
+      setAdding(false);
+    }
+  }
+
+  async function removePerson(orderId) {
+    if (deleting) return;
+    setDeleting(orderId);
+    setErr("");
+    try {
+      await apiFetch(`/admin/list/${orderId}`, { method: "DELETE" });
+      setEvents((prev) =>
+        prev.map((ev) => ({
+          ...ev,
+          people: ev.people.filter((p) => p.orderId !== orderId),
+        }))
+      );
+    } catch (e) {
+      setErr(e?.data?.error || "delete_failed");
+    } finally {
+      setDeleting(null);
     }
   }
 
@@ -115,6 +169,41 @@ export default function ListPage() {
 
         <div className="hr" />
 
+        {/* Formulario agregar persona manual */}
+        <form onSubmit={addPerson} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
+          <div>
+            <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>Nombre</div>
+            <input className="input" value={addFirst} onChange={(e) => setAddFirst(e.target.value)} placeholder="Juan" />
+          </div>
+          <div>
+            <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>Apellido</div>
+            <input className="input" value={addLast} onChange={(e) => setAddLast(e.target.value)} placeholder="Pérez" />
+          </div>
+          <div>
+            <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>DNI</div>
+            <input className="input" inputMode="numeric" value={addDni} onChange={(e) => setAddDni(e.target.value.replace(/\D/g, ""))} placeholder="12345678" />
+          </div>
+          <div>
+            <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>Evento</div>
+            <select className="input" value={addTicket} onChange={(e) => setAddTicket(e.target.value)}>
+              <option value="">Seleccionar...</option>
+              {events.map((ev) => (
+                <option key={ev.ticketId} value={ev.ticketId}>
+                  {ev.ticketName}
+                  {ev.eventDate ? ` — ${new Date(ev.eventDate.slice(0, 10) + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "short" })}` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <Button variant="primary" disabled={adding || !addFirst.trim() || !addLast.trim() || !addDni.trim() || !addTicket}>
+              {adding ? "Agregando..." : "Agregar a la lista"}
+            </Button>
+          </div>
+        </form>
+
+        <div className="hr" />
+
         {loading && <p style={{ color: "var(--muted)" }}>Cargando lista...</p>}
         {err && (
           <div className="notice error">
@@ -166,8 +255,9 @@ export default function ListPage() {
                         <th style={thStyle}>Nombre</th>
                         <th style={thStyle}>Apellido</th>
                         <th style={thStyle}>DNI</th>
-                        <th style={thStyle}>Cant.</th>
+                        <th style={thStyle}>Tipo</th>
                         <th style={{ ...thStyle, textAlign: "center" }}>Estado</th>
+                        <th style={{ ...thStyle, textAlign: "center" }}></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -192,8 +282,10 @@ export default function ListPage() {
                           <td style={tdStyle} className="mono">
                             {p.dni}
                           </td>
-                          <td style={tdStyle} className="mono">
-                            {p.quantity}
+                          <td style={tdStyle}>
+                            <span className={`badge ${p.manual ? "warn" : ""}`} style={{ fontSize: 11 }}>
+                              {p.manual ? "Manual" : "Compra"}
+                            </span>
                           </td>
                           <td style={{ ...tdStyle, textAlign: "center" }}>
                             <button
@@ -214,6 +306,26 @@ export default function ListPage() {
                             >
                               {toggling === p.orderId ? "..." : p.scanned ? "✓ Pasó" : "Marcar"}
                             </button>
+                          </td>
+                          <td style={{ ...tdStyle, textAlign: "center" }}>
+                            {p.manual && (
+                              <button
+                                type="button"
+                                onClick={() => { if (window.confirm(`¿Eliminar a ${p.firstName} ${p.lastName} de la lista?`)) removePerson(p.orderId); }}
+                                disabled={deleting === p.orderId}
+                                style={{
+                                  background: "transparent",
+                                  color: "#e03131",
+                                  border: "1px solid rgba(224,49,49,.3)",
+                                  borderRadius: 8,
+                                  padding: "4px 10px",
+                                  fontSize: 12,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {deleting === p.orderId ? "..." : "✕"}
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}
