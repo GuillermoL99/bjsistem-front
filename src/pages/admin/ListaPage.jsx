@@ -69,69 +69,71 @@ function ListaPage() {
 
   return (
     <div className="container" style={{ marginTop: 32, marginBottom: 32 }}>
-      <div className="card" style={{ width: "100%", maxWidth: "100%" }}>
-        <h2 style={{ marginBottom: 8 }}>Lista Free</h2>
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            gap: 12,
-            marginBottom: 18,
-            flexWrap: "wrap",
-            width: "100%"
-          }}
-        >
-        <input
-          className="input"
-          name="nombre"
-          placeholder="Nombre"
-          value={form.nombre}
-          onChange={handleChange}
-          required
-          disabled={loading}
-          style={{ flex: 1 }}
-        />
-        <input
-          className="input"
-          name="apellido"
-          placeholder="Apellido"
-          value={form.apellido}
-          onChange={handleChange}
-          required
-          disabled={loading}
-          style={{ flex: 1 }}
-        />
-        <input
-          className="input"
-          name="dni"
-          placeholder="DNI"
-          value={form.dni}
-          onChange={handleChange}
-          required
-          disabled={loading}
-          style={{ flex: 1 }}
-        />
-        <button
-          className="btn btnPrimary"
-          type="submit"
-          disabled={loading}
-          style={{ minWidth: 140, flex: "1 1 100%", maxWidth: 200 }}
-        >
-          {loading ? "Agregando..." : "Agregar a la lista"}
-        </button>
-      </form>
-        <div style={{ marginBottom: 18 }}>
-        <input
-          className="input"
-          placeholder="Buscar por nombre, apellido o DNI"
-          value={busqueda}
-          onChange={e => setBusqueda(e.target.value)}
-          style={{ width: "100%", minWidth: 0 }}
-        />
-      </div>
-        {error && <div className="notice error" style={{ marginTop: 8 }}>{error}</div>}
+      <div className="card">
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 22 }}>Lista Free</h2>
+            <p style={{ margin: "6px 0 0", color: "var(--muted)", lineHeight: 1.55 }}>
+              Personas agregadas manualmente al sistema.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
+              <input
+                className="input"
+                name="nombre"
+                placeholder="Nombre"
+                value={form.nombre}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                style={{ minWidth: 120 }}
+              />
+              <input
+                className="input"
+                name="apellido"
+                placeholder="Apellido"
+                value={form.apellido}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                style={{ minWidth: 120 }}
+              />
+              <input
+                className="input"
+                name="dni"
+                placeholder="DNI"
+                value={form.dni}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                style={{ minWidth: 100 }}
+              />
+              <button className="btn btnPrimary" type="submit" disabled={loading} style={{ minWidth: 120 }}>
+                {loading ? "Agregando..." : "Agregar a la lista"}
+              </button>
+            </form>
+          </div>
+        </div>
+        <div className="hr" />
+        <div>
+          <input
+            className="input"
+            placeholder="Buscar por nombre, apellido o DNI..."
+            value={busqueda}
+            onChange={e => setBusqueda(e.target.value)}
+            style={{ width: "100%" }}
+          />
+        </div>
+        {error && (
+          <div className="notice error" style={{ marginTop: 12 }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Error</div>
+            <div className="mono">{error}</div>
+          </div>
+        )}
         {success && <div className="notice" style={{ color: "var(--accent2)", marginTop: 8 }}>{success}</div>}
-        <div style={{ width: "100%", overflowX: "auto", marginTop: 16 }}>
+        <div className="hr" />
+        <div style={{ width: "100%", overflowX: "auto" }}>
           <table className="table" style={{ minWidth: 600 }}>
             <thead>
               <tr>
