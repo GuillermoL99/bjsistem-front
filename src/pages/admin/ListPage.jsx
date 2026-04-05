@@ -29,10 +29,9 @@ export default function ListPage() {
     try {
       const data = await apiFetch("/admin/list");
       setPeople(data.people || []);
-      if (data.eventDate) {
+      // Solo actualizar la fecha si viene definida (no limpiar si falta)
+      if (typeof data.eventDate === "string" && data.eventDate) {
         setEventDate(data.eventDate.slice(0, 10));
-      } else {
-        setEventDate("");
       }
     } catch (e) {
       setErr(e?.data?.error || "load_failed");
