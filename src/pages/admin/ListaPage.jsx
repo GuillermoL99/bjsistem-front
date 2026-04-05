@@ -129,13 +129,34 @@ function ListaPage() {
         </thead>
         <tbody>
           {filteredPersonas.map((p, i) => (
-            <tr key={p._id || i}>
+            <tr
+              key={p._id || i}
+              style={p.passed ? { background: "rgba(34,197,94,0.18)" } : {}}
+            >
               <td>{i + 1}</td>
               <td>{p.buyer_firstName}</td>
               <td>{p.buyer_lastName}</td>
               <td>{p.buyer_dni}</td>
               <td>{p.addedBy || "-"}</td>
-              <td><button className="btn">Marcar</button></td>
+              <td>
+                <button
+                  className={"btn" + (p.passed ? " btnPrimary" : "")}
+                  style={p.passed ? { background: "var(--accent2)", borderColor: "var(--accent2)", color: "#fff" } : {}}
+                  onClick={async () => {
+                    try {
+                      const res = await apiFetch(`/admin/lista/marcar/${p._id}`, {
+                        method: "PATCH",
+                        body: JSON.stringify({ passed: !p.passed }),
+                      });
+                      setPersonas(personas => personas.map(x => x._id === p._id ? { ...x, passed: res.order.passed } : x));
+                    } catch (e) {
+                      alert("Error al marcar/desmarcar");
+                    }
+                  }}
+                >
+                  {p.passed ? "Pasó" : "Marcar"}
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
