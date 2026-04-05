@@ -7,7 +7,7 @@ function ListaPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [filters, setFilters] = useState({ nombre: "", apellido: "", dni: "" });
+  const [busqueda, setBusqueda] = useState("");
   // Cargar personas al montar
   useEffect(() => {
     async function load() {
@@ -53,17 +53,19 @@ function ListaPage() {
 
   // Filtros en tiempo real
   const filteredPersonas = useMemo(() => {
+    const q = busqueda.trim().toLowerCase();
+    if (!q) return personas;
     return personas.filter((p) => {
       const nombre = (p.buyer_firstName || "").toLowerCase();
       const apellido = (p.buyer_lastName || "").toLowerCase();
       const dni = (p.buyer_dni || "").toLowerCase();
       return (
-        nombre.includes(filters.nombre.toLowerCase()) &&
-        apellido.includes(filters.apellido.toLowerCase()) &&
-        dni.includes(filters.dni.toLowerCase())
+        nombre.includes(q) ||
+        apellido.includes(q) ||
+        dni.includes(q)
       );
     });
-  }, [personas, filters]);
+  }, [personas, busqueda]);
 
   return (
     <div className="card" style={{ maxWidth: 1100, margin: "32px auto" }}>
@@ -103,27 +105,13 @@ function ListaPage() {
           {loading ? "Agregando..." : "Agregar a la lista"}
         </button>
       </form>
-      <div style={{ display: "flex", gap: 12, marginBottom: 18 }}>
+      <div style={{ marginBottom: 18 }}>
         <input
           className="input"
-          placeholder="Nombre"
-          value={filters.nombre}
-          onChange={e => setFilters(f => ({ ...f, nombre: e.target.value }))}
-          style={{ flex: 1 }}
-        />
-        <input
-          className="input"
-          placeholder="Apellido"
-          value={filters.apellido}
-          onChange={e => setFilters(f => ({ ...f, apellido: e.target.value }))}
-          style={{ flex: 1 }}
-        />
-        <input
-          className="input"
-          placeholder="DNI"
-          value={filters.dni}
-          onChange={e => setFilters(f => ({ ...f, dni: e.target.value }))}
-          style={{ flex: 1 }}
+          placeholder="Buscar por nombre, apellido o DNI"
+          value={busqueda}
+          onChange={e => setBusqueda(e.target.value)}
+          style={{ width: "100%" }}
         />
       </div>
       {error && <div className="notice error" style={{ marginTop: 8 }}>{error}</div>}
