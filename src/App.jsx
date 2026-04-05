@@ -10,8 +10,8 @@ import TicketsPage from "./pages/admin/ticketsPage";
 import ClientsPage from "./pages/admin/clientsPage";
 import ClientOrderDetailPage from "./pages/admin/ClientOrderDetailPage";
 import MetricsPage from "./pages/admin/MetricsPage";
-import ListPage from "./pages/admin/ListPage";
-import MultiListPage from "./pages/admin/MultiListPage";
+// import ListPage from "./pages/admin/ListPage";
+// import MultiListPage from "./pages/admin/MultiListPage";
 
 export default function App() {
   return (
@@ -28,8 +28,8 @@ export default function App() {
         <Route path="clients" element={<ClientsPage />} />
         <Route path="clients/:orderId" element={<ClientOrderDetailPage />} />
         <Route path="metrics" element={<MetricsPage />} />
-        <Route path="list" element={<MultiListPage />} />
-        <Route path="multilist" element={<MultiListPage />} />
+        {/* <Route path="list" element={<MultiListPage />} /> */}
+        {/* <Route path="multilist" element={<MultiListPage />} /> */}
       </Route>
 
       <Route path="/success" element={<Result />} />
