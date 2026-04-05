@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { apiFetch } from "../../lib/api";
 
 function ListaPage() {
@@ -7,6 +7,19 @@ function ListaPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [filters, setFilters] = useState({ nombre: "", apellido: "", dni: "" });
+  // Cargar personas al montar
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await apiFetch("/admin/orders?status=manual");
+        setPersonas(res.orders || []);
+      } catch (e) {
+        setError("Error al cargar la lista");
+      }
+    }
+    load();
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,7 +39,9 @@ function ListaPage() {
           dni: form.dni,
         }),
       });
-      setPersonas([...personas, res.order]);
+      // Recargar lista desde backend
+      const updated = await apiFetch("/admin/orders?status=manual");
+      setPersonas(updated.orders || []);
       setForm({ nombre: "", apellido: "", dni: "" });
       setSuccess("Persona agregada correctamente.");
     } catch (e) {
@@ -36,10 +51,24 @@ function ListaPage() {
     }
   };
 
+  // Filtros en tiempo real
+  const filteredPersonas = useMemo(() => {
+    return personas.filter((p) => {
+      const nombre = (p.buyer_firstName || "").toLowerCase();
+      const apellido = (p.buyer_lastName || "").toLowerCase();
+      const dni = (p.buyer_dni || "").toLowerCase();
+      return (
+        nombre.includes(filters.nombre.toLowerCase()) &&
+        apellido.includes(filters.apellido.toLowerCase()) &&
+        dni.includes(filters.dni.toLowerCase())
+      );
+    });
+  }, [personas, filters]);
+
   return (
-    <div style={{ maxWidth: 400, margin: "auto" }}>
-      <h2>Lista de Personas</h2>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ maxWidth: 900, margin: "auto" }}>
+      <h2>Lista Free</h2>
+      <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, marginBottom: 16 }}>
         <input
           name="nombre"
           placeholder="Nombre"
@@ -65,16 +94,55 @@ function ListaPage() {
           disabled={loading}
         />
         <button type="submit" disabled={loading}>
-          {loading ? "Agregando..." : "Agregar"}
+          {loading ? "Agregando..." : "Agregar a la lista"}
         </button>
       </form>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+        <input
+          placeholder="Nombre"
+          value={filters.nombre}
+          onChange={e => setFilters(f => ({ ...f, nombre: e.target.value }))}
+          style={{ flex: 1 }}
+        />
+        <input
+          placeholder="Apellido"
+          value={filters.apellido}
+          onChange={e => setFilters(f => ({ ...f, apellido: e.target.value }))}
+          style={{ flex: 1 }}
+        />
+        <input
+          placeholder="DNI"
+          value={filters.dni}
+          onChange={e => setFilters(f => ({ ...f, dni: e.target.value }))}
+          style={{ flex: 1 }}
+        />
+      </div>
       {error && <div style={{ color: "red", marginTop: 8 }}>{error}</div>}
       {success && <div style={{ color: "green", marginTop: 8 }}>{success}</div>}
-      <ul style={{ marginTop: 24 }}>
-        {personas.map((p, i) => (
-          <li key={i}>{p.buyer_firstName || p.nombre} {p.buyer_lastName || p.apellido} - DNI: {p.buyer_dni || p.dni}</li>
-        ))}
-      </ul>
+      <table style={{ width: "100%", marginTop: 16, borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>DNI</th>
+            <th>Agregado por</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredPersonas.map((p, i) => (
+            <tr key={p._id || i}>
+              <td>{i + 1}</td>
+              <td>{p.buyer_firstName}</td>
+              <td>{p.buyer_lastName}</td>
+              <td>{p.buyer_dni}</td>
+              <td>{p.addedBy || "-"}</td>
+              <td><button>Marcar</button></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
