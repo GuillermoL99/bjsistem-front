@@ -148,18 +148,40 @@ export default function AdminLayout() {
                 >
                   Métricas
                 </Link>
+                <Link
+                  className={
+                    location.pathname.startsWith("/admin/list")
+                      ? "adminLink active"
+                      : "adminLink"
+                  }
+                  to="/admin/list"
+                >
+                  Lista
+                </Link>
               </>
             ) : (
-              <Link
-                className={
-                  location.pathname.startsWith("/admin/scan")
-                    ? "adminLink active"
-                    : "adminLink"
-                }
-                to="/admin/scan"
-              >
-                Escanear
-              </Link>
+              <>
+                <Link
+                  className={
+                    location.pathname.startsWith("/admin/scan")
+                      ? "adminLink active"
+                      : "adminLink"
+                  }
+                  to="/admin/scan"
+                >
+                  Escanear
+                </Link>
+                <Link
+                  className={
+                    location.pathname.startsWith("/admin/list")
+                      ? "adminLink active"
+                      : "adminLink"
+                  }
+                  to="/admin/list"
+                >
+                  Lista
+                </Link>
+              </>
             )}
 
             <button

@@ -10,6 +10,7 @@ import TicketsPage from "./pages/admin/ticketsPage";
 import ClientsPage from "./pages/admin/clientsPage";
 import ClientOrderDetailPage from "./pages/admin/ClientOrderDetailPage";
 import MetricsPage from "./pages/admin/MetricsPage";
+import ListPage from "./pages/admin/ListPage";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="clients" element={<ClientsPage />} />
         <Route path="clients/:orderId" element={<ClientOrderDetailPage />} />
         <Route path="metrics" element={<MetricsPage />} />
+        <Route path="list" element={<ListPage />} />
       </Route>
 
       <Route path="/success" element={<Result />} />
