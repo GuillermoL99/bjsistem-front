@@ -3,22 +3,25 @@ import Card from "../../components/Card";
 import Button from "../../components/Button";
 import { apiFetch } from "../../lib/api";
 
-function TicketCard({ t, busy, onToggleActive, onSave }) {
+function TicketCard({ t, busy, onToggleActive, onSave, onDelete }) {
   const [name, setName] = useState(t.name || "");
   const [priceARS, setPriceARS] = useState(String(t.priceARS ?? ""));
   const [stock, setStock] = useState(String(t.stock ?? ""));
+  const [eventDate, setEventDate] = useState(t.eventDate ? t.eventDate.slice(0, 10) : "");
 
   // Si se recarga la lista, sincronizamos el form
   useEffect(() => {
     setName(t.name || "");
     setPriceARS(String(t.priceARS ?? ""));
     setStock(String(t.stock ?? ""));
-  }, [t.id, t.name, t.priceARS, t.stock]);
+    setEventDate(t.eventDate ? t.eventDate.slice(0, 10) : "");
+  }, [t.id, t.name, t.priceARS, t.stock, t.eventDate]);
 
   const changed =
     name.trim() !== (t.name || "") ||
     Number(priceARS) !== Number(t.priceARS) ||
-    Number(stock) !== Number(t.stock);
+    Number(stock) !== Number(t.stock) ||
+    eventDate !== (t.eventDate ? t.eventDate.slice(0, 10) : "");
 
   const invalid =
     !name.trim() ||
@@ -69,13 +72,9 @@ function TicketCard({ t, busy, onToggleActive, onSave }) {
 
         <div>
           <div className="label" style={{ marginBottom: 6 }}>
-            Info
+            Fecha evento
           </div>
-
-          <div className="notice" style={{ margin: 0 }}>
-            <div className="mono">Precio actual: {t.priceARS} ARS</div>
-            <div className="mono">Stock actual: {t.stock}</div>
-          </div>
+          <input className="input" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} disabled={busy} />
         </div>
       </div>
 
@@ -87,6 +86,16 @@ function TicketCard({ t, busy, onToggleActive, onSave }) {
             {busy ? "Guardando..." : t.active ? "Desactivar" : "Activar"}
           </button>
 
+          <button
+            className="btn"
+            type="button"
+            onClick={() => { if (window.confirm(`¿Eliminar "${t.name}"? Esta acción no se puede deshacer.`)) onDelete(); }}
+            disabled={busy}
+            style={{ color: "#e03131" }}
+          >
+            {busy ? "Eliminando..." : "Eliminar"}
+          </button>
+
           <Button
             variant="primary"
             onClick={() =>
@@ -94,6 +103,7 @@ function TicketCard({ t, busy, onToggleActive, onSave }) {
                 name: name.trim(),
                 priceARS: Number(priceARS),
                 stock: Number(stock),
+                eventDate: eventDate || null,
               })
             }
             disabled={busy || !changed || invalid}
@@ -124,6 +134,7 @@ export default function TicketsPage() {
   const [newName, setNewName] = useState("");
   const [newPriceARS, setNewPriceARS] = useState("");
   const [newStock, setNewStock] = useState("");
+  const [newEventDate, setNewEventDate] = useState("");
 
   const stats = useMemo(() => {
     const total = tickets.length;
@@ -162,12 +173,14 @@ export default function TicketsPage() {
           name: String(newName || "").trim(),
           priceARS: Number(newPriceARS),
           stock: Number(newStock),
+          eventDate: newEventDate || null,
         }),
       });
 
       setNewName("");
       setNewPriceARS("");
       setNewStock("");
+      setNewEventDate("");
       await loadTickets();
     } catch (e) {
       setErr(e?.data?.error || "create_failed");
@@ -207,6 +220,21 @@ export default function TicketsPage() {
       await loadTickets();
     } catch (e) {
       setErr(e?.data?.error || "update_failed");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function deleteTicket(t) {
+    if (busyId || creating || loading) return;
+
+    setErr("");
+    setBusyId(t.id);
+    try {
+      await apiFetch(`/admin/tickets/${t.id}`, { method: "DELETE" });
+      await loadTickets();
+    } catch (e) {
+      setErr(e?.data?.error || "delete_failed");
     } finally {
       setBusyId(null);
     }
@@ -257,7 +285,7 @@ export default function TicketsPage() {
           </div>
         )}
 
-        <form onSubmit={createTicket} style={{ display: "grid", gridTemplateColumns: "1.2fr .7fr .7fr", gap: 12 }}>
+        <form onSubmit={createTicket} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <div className="label" style={{ marginBottom: 6 }}>Nombre</div>
             <input className="input" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Entrada VIP" />
@@ -271,6 +299,11 @@ export default function TicketsPage() {
           <div>
             <div className="label" style={{ marginBottom: 6 }}>Stock</div>
             <input className="input" value={newStock} onChange={(e) => setNewStock(e.target.value)} placeholder="50" />
+          </div>
+
+          <div>
+            <div className="label" style={{ marginBottom: 6 }}>Fecha evento</div>
+            <input className="input" type="date" value={newEventDate} onChange={(e) => setNewEventDate(e.target.value)} />
           </div>
 
           <div style={{ gridColumn: "1 / -1", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
@@ -305,6 +338,7 @@ export default function TicketsPage() {
                 busy={busyId === t.id}
                 onToggleActive={() => toggleActive(t)}
                 onSave={(patch) => saveTicket(t, patch)}
+                onDelete={() => deleteTicket(t)}
               />
             ))}
           </div>
