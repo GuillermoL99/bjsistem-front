@@ -71,118 +71,166 @@ function ListaPage() {
     });
   }, [personas, busqueda]);
 
+  // Borrar una persona por ID
+  const handleDeleteOne = async (id) => {
+    if (!window.confirm("¿Seguro que deseas borrar esta persona de la lista?")) return;
+    setError("");
+    setSuccess("");
+    setLoading(true);
+    try {
+      await apiFetch(`/admin/lista/${id}`, { method: "DELETE" });
+      setPersonas(personas => personas.filter(p => p._id !== id));
+      setSuccess("Persona eliminada correctamente.");
+    } catch (e) {
+      setError("Error al borrar persona");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Borrar todas las personas
+  const handleDeleteAll = async () => {
+    if (!window.confirm("¿Seguro que deseas borrar TODAS las personas de la lista?")) return;
+    setError("");
+    setSuccess("");
+    setLoading(true);
+    try {
+      await apiFetch(`/admin/lista`, { method: "DELETE" });
+      setPersonas([]);
+      setSuccess("Lista vaciada correctamente.");
+    } catch (e) {
+      setError("Error al vaciar la lista");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    
-      <div className="card" style={{ width: "100%" }}>
+    <div className="card" style={{ width: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 22 }}>Lista Free</h2>
           <p style={{ margin: "6px 0 0", color: "var(--muted)", lineHeight: 1.55 }}>
             Personas agregadas manualmente al sistema.
           </p>
         </div>
-        <div className="hr" />
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>
-          <input
-            className="input"
-            name="nombre"
-            placeholder="Nombre"
-            value={form.nombre}
-            onChange={handleChange}
-            required
-            disabled={loading}
-            style={{ flex: 1, minWidth: 120 }}
-          />
-          <input
-            className="input"
-            name="apellido"
-            placeholder="Apellido"
-            value={form.apellido}
-            onChange={handleChange}
-            required
-            disabled={loading}
-            style={{ flex: 1, minWidth: 120 }}
-          />
-          <input
-            className="input"
-            name="dni"
-            placeholder="DNI"
-            value={form.dni}
-            onChange={handleChange}
-            required
-            disabled={loading}
-            style={{ flex: 1, minWidth: 100 }}
-          />
-          <button className="btn btnPrimary" type="submit" disabled={loading} style={{ minWidth: 120 }}>
-            {loading ? "Agregando..." : "Agregar a la lista"}
-          </button>
-        </form>
-        <div className="hr" />
-        <div>
-          <input
-            className="input"
-            placeholder="Buscar por nombre, apellido o DNI..."
-            value={busqueda}
-            onChange={e => setBusqueda(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </div>
-        {error && (
-          <div className="notice error" style={{ marginTop: 12 }}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Error</div>
-            <div className="mono">{error}</div>
-          </div>
-        )}
-        {success && <div className="notice" style={{ color: "var(--accent2)", marginTop: 8 }}>{success}</div>}
-        <div className="hr" />
-        <div style={{ width: "100%", overflowX: "auto" }}>
-          <table className="table" style={{ minWidth: 600 }}>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>DNI</th>
-                <th>Agregado por</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPersonas.map((p, i) => (
-                <tr
-                  key={p._id || i}
-                  style={p.passed ? { background: "rgba(34,197,94,0.18)" } : {}}
-                >
-                  <td>{i + 1}</td>
-                  <td>{p.buyer_firstName}</td>
-                  <td>{p.buyer_lastName}</td>
-                  <td>{p.buyer_dni}</td>
-                  <td>{p.addedBy || "-"}</td>
-                  <td>
-                    <button
-                      className={"btn" + (p.passed ? " btnPrimary" : "")}
-                      style={p.passed ? { background: "var(--accent2)", borderColor: "var(--accent2)", color: "#fff" } : {}}
-                      onClick={async () => {
-                        try {
-                          const res = await apiFetch(`/admin/lista/marcar/${p._id}`, {
-                            method: "PATCH",
-                            body: JSON.stringify({ passed: !p.passed }),
-                          });
-                          setPersonas(personas => personas.map(x => x._id === p._id ? { ...x, passed: res.order.passed } : x));
-                        } catch (e) {
-                          alert("Error al marcar/desmarcar");
-                        }
-                      }}
-                    >
-                      {p.passed ? "Pasó" : "Marcar"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <button className="btn" style={{ background: "var(--bad)", color: "#fff", minWidth: 120 }} onClick={handleDeleteAll} disabled={loading || personas.length === 0}>
+          Borrar toda la lista
+        </button>
       </div>
-    
+      <div className="hr" />
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>
+        <input
+          className="input"
+          name="nombre"
+          placeholder="Nombre"
+          value={form.nombre}
+          onChange={handleChange}
+          required
+          disabled={loading}
+          style={{ flex: 1, minWidth: 120 }}
+        />
+        <input
+          className="input"
+          name="apellido"
+          placeholder="Apellido"
+          value={form.apellido}
+          onChange={handleChange}
+          required
+          disabled={loading}
+          style={{ flex: 1, minWidth: 120 }}
+        />
+        <input
+          className="input"
+          name="dni"
+          placeholder="DNI"
+          value={form.dni}
+          onChange={handleChange}
+          required
+          disabled={loading}
+          style={{ flex: 1, minWidth: 100 }}
+        />
+        <button className="btn btnPrimary" type="submit" disabled={loading} style={{ minWidth: 120 }}>
+          {loading ? "Agregando..." : "Agregar a la lista"}
+        </button>
+      </form>
+      <div className="hr" />
+      <div>
+        <input
+          className="input"
+          placeholder="Buscar por nombre, apellido o DNI..."
+          value={busqueda}
+          onChange={e => setBusqueda(e.target.value)}
+          style={{ width: "100%" }}
+        />
+      </div>
+      {error && (
+        <div className="notice error" style={{ marginTop: 12 }}>
+          <div style={{ fontWeight: 700, marginBottom: 6 }}>Error</div>
+          <div className="mono">{error}</div>
+        </div>
+      )}
+      {success && <div className="notice" style={{ color: "var(--accent2)", marginTop: 8 }}>{success}</div>}
+      <div className="hr" />
+      <div style={{ width: "100%", overflowX: "auto" }}>
+        <table className="table" style={{ minWidth: 600 }}>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>DNI</th>
+              <th>Agregado por</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPersonas.map((p, i) => (
+              <tr
+                key={p._id || i}
+                style={p.passed ? { background: "rgba(34,197,94,0.18)" } : {}}
+              >
+                <td>{i + 1}</td>
+                <td>{p.buyer_firstName}</td>
+                <td>{p.buyer_lastName}</td>
+                <td>{p.buyer_dni}</td>
+                <td>{p.addedBy || "-"}</td>
+                <td>
+                  <button
+                    className={"btn" + (p.passed ? " btnPrimary" : "")}
+                    style={p.passed ? { background: "var(--accent2)", borderColor: "var(--accent2)", color: "#fff" } : {}}
+                    onClick={async () => {
+                      try {
+                        const res = await apiFetch(`/admin/lista/marcar/${p._id}`, {
+                          method: "PATCH",
+                          body: JSON.stringify({ passed: !p.passed }),
+                        });
+                        setPersonas(personas => personas.map(x => x._id === p._id ? { ...x, passed: res.order.passed } : x));
+                      } catch (e) {
+                        alert("Error al marcar/desmarcar");
+                      }
+                    }}
+                  >
+                    {p.passed ? "Pasó" : "Marcar"}
+                  </button>
+                </td>
+                <td>
+                  <button
+                    className="btn"
+                    style={{ background: "var(--bad)", color: "#fff" }}
+                    onClick={() => handleDeleteOne(p._id)}
+                    disabled={loading}
+                  >
+                    Borrar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 
