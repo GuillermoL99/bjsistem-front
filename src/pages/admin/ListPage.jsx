@@ -83,7 +83,7 @@ export default function ListPage() {
     setAdding(true);
     setErr("");
     try {
-      await apiFetch("/admin/list", {
+      await apiFetch("/admin/list/person", {
         method: "POST",
         body: JSON.stringify({
           ticketId: "free",
