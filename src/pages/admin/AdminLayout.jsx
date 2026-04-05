@@ -148,7 +148,16 @@ export default function AdminLayout() {
                 >
                   Métricas
                 </Link>
-                {/* Lista eliminada */}
+                <Link
+                  className={
+                    location.pathname.startsWith("/admin/lista")
+                      ? "adminLink active"
+                      : "adminLink"
+                  }
+                  to="/admin/lista"
+                >
+                  Lista
+                </Link>
               </>
             ) : (
               <>
@@ -162,7 +171,16 @@ export default function AdminLayout() {
                 >
                   Escanear
                 </Link>
-                {/* Lista eliminada para STAFF */}
+                <Link
+                  className={
+                    location.pathname.startsWith("/admin/lista")
+                      ? "adminLink active"
+                      : "adminLink"
+                  }
+                  to="/admin/lista"
+                >
+                  Lista
+                </Link>
               </>
             )}
 
