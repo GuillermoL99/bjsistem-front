@@ -68,7 +68,7 @@ function ListaPage() {
   }, [personas, busqueda]);
 
   return (
-    <div className="container" style={{ marginTop: 32, marginBottom: 32 }}>
+    
       <div className="card" style={{ width: "100%" }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 22 }}>Lista Free</h2>
@@ -178,7 +178,7 @@ function ListaPage() {
           </table>
         </div>
       </div>
-    </div>
+    
   );
 }
 
