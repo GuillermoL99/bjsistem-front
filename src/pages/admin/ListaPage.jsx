@@ -66,60 +66,69 @@ function ListaPage() {
   }, [personas, filters]);
 
   return (
-    <div style={{ maxWidth: 900, margin: "auto" }}>
-      <h2>Lista Free</h2>
-      <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+    <div className="card" style={{ maxWidth: 1100, margin: "32px auto" }}>
+      <h2 style={{ marginBottom: 8 }}>Lista Free</h2>
+      <form onSubmit={handleSubmit} style={{ display: "flex", gap: 12, marginBottom: 18 }}>
         <input
+          className="input"
           name="nombre"
           placeholder="Nombre"
           value={form.nombre}
           onChange={handleChange}
           required
           disabled={loading}
+          style={{ flex: 1 }}
         />
         <input
+          className="input"
           name="apellido"
           placeholder="Apellido"
           value={form.apellido}
           onChange={handleChange}
           required
           disabled={loading}
+          style={{ flex: 1 }}
         />
         <input
+          className="input"
           name="dni"
           placeholder="DNI"
           value={form.dni}
           onChange={handleChange}
           required
           disabled={loading}
+          style={{ flex: 1 }}
         />
-        <button type="submit" disabled={loading}>
+        <button className="btn btnPrimary" type="submit" disabled={loading} style={{ minWidth: 140 }}>
           {loading ? "Agregando..." : "Agregar a la lista"}
         </button>
       </form>
-      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 18 }}>
         <input
+          className="input"
           placeholder="Nombre"
           value={filters.nombre}
           onChange={e => setFilters(f => ({ ...f, nombre: e.target.value }))}
           style={{ flex: 1 }}
         />
         <input
+          className="input"
           placeholder="Apellido"
           value={filters.apellido}
           onChange={e => setFilters(f => ({ ...f, apellido: e.target.value }))}
           style={{ flex: 1 }}
         />
         <input
+          className="input"
           placeholder="DNI"
           value={filters.dni}
           onChange={e => setFilters(f => ({ ...f, dni: e.target.value }))}
           style={{ flex: 1 }}
         />
       </div>
-      {error && <div style={{ color: "red", marginTop: 8 }}>{error}</div>}
-      {success && <div style={{ color: "green", marginTop: 8 }}>{success}</div>}
-      <table style={{ width: "100%", marginTop: 16, borderCollapse: "collapse" }}>
+      {error && <div className="notice error" style={{ marginTop: 8 }}>{error}</div>}
+      {success && <div className="notice" style={{ color: "var(--accent2)", marginTop: 8 }}>{success}</div>}
+      <table className="table" style={{ marginTop: 16 }}>
         <thead>
           <tr>
             <th>#</th>
@@ -138,7 +147,7 @@ function ListaPage() {
               <td>{p.buyer_lastName}</td>
               <td>{p.buyer_dni}</td>
               <td>{p.addedBy || "-"}</td>
-              <td><button>Marcar</button></td>
+              <td><button className="btn">Marcar</button></td>
             </tr>
           ))}
         </tbody>
