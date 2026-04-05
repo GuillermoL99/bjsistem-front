@@ -31,6 +31,12 @@ const RESULT_CONFIG = {
     title: "⚠️ Pago no aprobado",
     color: "var(--warn)",
   },
+  wrong_date: {
+    border: "rgba(239,68,68,.4)",
+    bg: "rgba(239,68,68,.08)",
+    title: "❌ Fecha incorrecta",
+    color: "rgba(239,68,68,.9)",
+  },
   server_error: {
     border: "rgba(239,68,68,.4)",
     bg: "rgba(239,68,68,.08)",
@@ -187,6 +193,20 @@ export default function ScanPage() {
             {result.code === "not_approved" && (
               <div className="mono" style={{ marginTop: 6 }}>
                 Estado del pago: {result.status || "-"}
+              </div>
+            )}
+
+            {result.code === "wrong_date" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 6 }}>
+                <div className="mono">
+                  Este QR corresponde a: {result.ticketName || "-"}
+                </div>
+                <div className="mono">
+                  Fecha del evento: {result.eventDate ? new Date(result.eventDate).toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) : "-"}
+                </div>
+                <div className="mono" style={{ fontWeight: 700 }}>
+                  La entrada no corresponde al día de hoy.
+                </div>
               </div>
             )}
           </div>
