@@ -45,7 +45,11 @@ function ListaPage() {
       setForm({ nombre: "", apellido: "", dni: "" });
       setSuccess("Persona agregada correctamente.");
     } catch (e) {
-      setError(e?.data?.error || "Error al guardar");
+      if (e?.data?.error === "dni_exists") {
+        setError("Ya existe una persona con ese DNI en la lista.");
+      } else {
+        setError(e?.data?.error || "Error al guardar");
+      }
     } finally {
       setLoading(false);
     }
