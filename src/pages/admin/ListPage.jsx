@@ -102,7 +102,7 @@ export default function ListPage() {
   }
 
   const eventsWithPeople = useMemo(
-    () => events.filter((ev) => ev.people.length > 0),
+    () => events.filter((ev) => ev.people.length > 0 || ev.ticketId === "free"),
     [events]
   );
 
