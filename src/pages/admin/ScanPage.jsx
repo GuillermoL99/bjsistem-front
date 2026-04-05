@@ -202,7 +202,7 @@ export default function ScanPage() {
                   Este QR corresponde a: {result.ticketName || "-"}
                 </div>
                 <div className="mono">
-                  Fecha del evento: {result.eventDate ? new Date(result.eventDate).toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) : "-"}
+                  Fecha del evento: {result.eventDate ? new Date(result.eventDate.slice(0, 10) + "T12:00:00").toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) : "-"}
                 </div>
                 <div className="mono" style={{ fontWeight: 700 }}>
                   La entrada no corresponde al día de hoy.

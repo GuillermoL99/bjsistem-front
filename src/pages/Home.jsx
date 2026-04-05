@@ -40,7 +40,7 @@ function TicketBuyCard({ t, paying, onPay, onShowInfo }) {
           <h2 style={{ margin: 0, fontSize: 20, lineHeight: 1.25 }}>{t.name}</h2>
           <p style={{ margin: "6px 0 0", color: "var(--muted)", fontSize: 14 }}>
             📅 {t.eventDate
-              ? new Date(t.eventDate).toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+              ? new Date(t.eventDate.slice(0, 10) + "T12:00:00").toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
               : "Fecha no definida"}
           </p>
         </div>

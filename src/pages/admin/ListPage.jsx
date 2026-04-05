@@ -101,7 +101,7 @@ export default function ListPage() {
               <option key={ev.ticketId} value={ev.ticketId}>
                 {ev.ticketName}
                 {ev.eventDate
-                  ? ` — ${new Date(ev.eventDate).toLocaleDateString("es-AR", { day: "numeric", month: "short" })}`
+                  ? ` — ${new Date(ev.eventDate.slice(0, 10) + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "short" })}`
                   : ""}
               </option>
             ))}
@@ -146,7 +146,7 @@ export default function ListPage() {
                   {ev.eventDate && (
                     <span className="badge" style={{ fontSize: 12 }}>
                       📅{" "}
-                      {new Date(ev.eventDate).toLocaleDateString("es-AR", {
+                      {new Date(ev.eventDate.slice(0, 10) + "T12:00:00").toLocaleDateString("es-AR", {
                         weekday: "short",
                         day: "numeric",
                         month: "short",
