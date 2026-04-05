@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import Card from "../../components/Card";
 import Button from "../../components/Button";
@@ -6,6 +7,7 @@ import { apiFetch } from "../../lib/api";
 export default function ListPage() {
   const [people, setPeople] = useState([]);
   const [eventDate, setEventDate] = useState("");
+  const [creatingList, setCreatingList] = useState(false);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [search, setSearch] = useState("");
@@ -36,6 +38,23 @@ export default function ListPage() {
       setErr(e?.data?.error || "load_failed");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function createList(date) {
+    setCreatingList(true);
+    setErr("");
+    try {
+      await apiFetch("/admin/list", {
+        method: "POST",
+        body: JSON.stringify({ eventDate: date }),
+      });
+      setEventDate(date);
+      await loadList();
+    } catch (e) {
+      setErr(e?.data?.error || "create_list_failed");
+    } finally {
+      setCreatingList(false);
     }
   }
 
@@ -99,30 +118,15 @@ export default function ListPage() {
     }
   }
 
-  async function saveDate(date) {
-    setSavingDate(true);
-    setErr("");
-    try {
-      await apiFetch("/admin/list/date", {
-        method: "PUT",
-        body: JSON.stringify({ eventDate: date || null }),
-      });
-      setEventDate(date);
-    } catch (e) {
-      setErr(e?.data?.error || "date_failed");
-    } finally {
-      setSavingDate(false);
-    }
-  }
-
-  async function clearAll() {
+  async function deleteList() {
     setClearing(true);
     setErr("");
     try {
       await apiFetch("/admin/list/all", { method: "DELETE" });
       setPeople([]);
+      setEventDate("");
     } catch (e) {
-      setErr(e?.data?.error || "clear_failed");
+      setErr(e?.data?.error || "delete_list_failed");
     } finally {
       setClearing(false);
     }
@@ -161,196 +165,198 @@ export default function ListPage() {
   return (
     <div className="adminPage">
       <Card title={dateLabel ? `Lista Free — ${dateLabel}` : "Lista Free"}>
-        {/* Fecha del evento + vaciar lista */}
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span className="label" style={{ fontSize: 12, whiteSpace: "nowrap" }}>Fecha del evento</span>
+        {!eventDate ? (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (!eventDate) return;
+              await createList(eventDate);
+            }}
+            style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12 }}
+          >
+            <span className="label" style={{ fontSize: 13 }}>Fecha del evento</span>
             <input
               className="input"
               type="date"
               value={eventDate}
-              onChange={(e) => saveDate(e.target.value)}
-              disabled={savingDate}
+              onChange={(e) => setEventDate(e.target.value)}
+              required
               style={{ minWidth: 150 }}
             />
-          </div>
-          {people.length > 0 && (
-            <button
-              type="button"
-              onClick={() => {
-                if (window.confirm(`¿Vaciar toda la lista? Se eliminarán ${people.length} persona(s). Esta acción no se puede deshacer.`))
-                  clearAll();
-              }}
-              disabled={clearing}
-              style={{
-                marginLeft: "auto",
-                background: "transparent",
-                color: "#e03131",
-                border: "1px solid rgba(224,49,49,.4)",
-                borderRadius: 8,
-                padding: "6px 16px",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              {clearing ? "Vaciando..." : "🗑 Vaciar lista"}
-            </button>
-          )}
-        </div>
-
-        <div className="hr" />
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-          <input
-            className="input"
-            placeholder="Buscar por nombre, apellido o DNI..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ flex: 1, minWidth: 200 }}
-          />
-
-          {staffList.length > 1 && (
-            <select
-              className="input"
-              value={selectedStaff}
-              onChange={(e) => setSelectedStaff(e.target.value)}
-              style={{ minWidth: 160 }}
-            >
-              <option value="all">Todos los staff</option>
-              {staffList.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          )}
-
-          <span className="badge ok">
-            <span className="dot" />
-            {filtered.length} persona{filtered.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-
-        <div className="hr" />
-
-        {/* Formulario agregar persona */}
-        <form onSubmit={addPerson} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
-          <div>
-            <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>Nombre</div>
-            <input className="input" value={addFirst} onChange={(e) => setAddFirst(e.target.value)} placeholder="Juan" />
-          </div>
-          <div>
-            <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>Apellido</div>
-            <input className="input" value={addLast} onChange={(e) => setAddLast(e.target.value)} placeholder="Pérez" />
-          </div>
-          <div>
-            <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>DNI</div>
-            <input className="input" inputMode="numeric" value={addDni} onChange={(e) => setAddDni(e.target.value.replace(/\D/g, ""))} placeholder="12345678" />
-          </div>
-          <div style={{ gridColumn: "1 / -1" }}>
-            <Button variant="primary" disabled={adding || !addFirst.trim() || !addLast.trim() || !addDni.trim()}>
-              {adding ? "Agregando..." : "Agregar a la lista"}
+            <Button variant="primary" type="submit" disabled={creatingList || !eventDate}>
+              {creatingList ? "Creando..." : "Crear lista"}
             </Button>
-          </div>
-        </form>
-
-        <div className="hr" />
-
-        {loading && <p style={{ color: "var(--muted)" }}>Cargando lista...</p>}
-        {err && (
-          <div className="notice error">
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Error</div>
-            <div className="mono">{err}</div>
-          </div>
-        )}
-
-        {!loading && !err && filtered.length === 0 && (
-          <p style={{ color: "var(--muted)" }}>
-            {search ? "No se encontraron resultados." : "No hay personas en la lista todavía."}
-          </p>
-        )}
-
-        {filtered.length > 0 && (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                  <th style={thStyle}>#</th>
-                  <th style={thStyle}>Nombre</th>
-                  <th style={thStyle}>Apellido</th>
-                  <th style={thStyle}>DNI</th>
-                  <th style={thStyle}>Agregado por</th>
-                  <th style={{ ...thStyle, textAlign: "center" }}>Estado</th>
-                  <th style={{ ...thStyle, textAlign: "center" }}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((p, i) => (
-                  <tr
-                    key={p.orderId}
-                    style={{
-                      borderBottom: "1px solid var(--border)",
-                      background: p.scanned ? "rgba(34,197,94,.12)" : "transparent",
-                      transition: "background .2s",
-                    }}
-                  >
-                    <td style={tdStyle} className="mono">
-                      {i + 1}
-                    </td>
-                    <td style={{ ...tdStyle, textDecoration: p.scanned ? "line-through" : "none", opacity: p.scanned ? 0.6 : 1 }}>
-                      {p.firstName}
-                    </td>
-                    <td style={{ ...tdStyle, textDecoration: p.scanned ? "line-through" : "none", opacity: p.scanned ? 0.6 : 1 }}>
-                      {p.lastName}
-                    </td>
-                    <td style={tdStyle} className="mono">
-                      {p.dni}
-                    </td>
-                    <td style={tdStyle}>
-                      <span style={{ fontSize: 12, color: "var(--muted)" }}>{p.addedBy || "—"}</span>
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: "center" }}>
-                      <button
-                        type="button"
-                        onClick={() => toggleCheck(p.orderId)}
-                        disabled={toggling === p.orderId}
+          </form>
+        ) : (
+          <>
+            <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12 }}>
+              <span className="label" style={{ fontSize: 13 }}>Fecha del evento: <b>{dateLabel}</b></span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm("¿Eliminar la lista? Se eliminarán todas las personas y la fecha. Esta acción no se puede deshacer.")) deleteList();
+                }}
+                disabled={clearing}
+                style={{
+                  marginLeft: "auto",
+                  background: "transparent",
+                  color: "#e03131",
+                  border: "1px solid rgba(224,49,49,.4)",
+                  borderRadius: 8,
+                  padding: "6px 16px",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                {clearing ? "Eliminando..." : "🗑 Eliminar lista"}
+              </button>
+            </div>
+            <div className="hr" />
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+              <input
+                className="input"
+                placeholder="Buscar por nombre, apellido o DNI..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ flex: 1, minWidth: 200 }}
+              />
+              {staffList.length > 1 && (
+                <select
+                  className="input"
+                  value={selectedStaff}
+                  onChange={(e) => setSelectedStaff(e.target.value)}
+                  style={{ minWidth: 160 }}
+                >
+                  <option value="all">Todos los staff</option>
+                  {staffList.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              )}
+              <span className="badge ok">
+                <span className="dot" />
+                {filtered.length} persona{filtered.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+            <div className="hr" />
+            {/* Formulario agregar persona */}
+            <form onSubmit={addPerson} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
+              <div>
+                <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>Nombre</div>
+                <input className="input" value={addFirst} onChange={(e) => setAddFirst(e.target.value)} placeholder="Juan" />
+              </div>
+              <div>
+                <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>Apellido</div>
+                <input className="input" value={addLast} onChange={(e) => setAddLast(e.target.value)} placeholder="Pérez" />
+              </div>
+              <div>
+                <div className="label" style={{ marginBottom: 4, fontSize: 12 }}>DNI</div>
+                <input className="input" inputMode="numeric" value={addDni} onChange={(e) => setAddDni(e.target.value.replace(/\D/g, ""))} placeholder="12345678" />
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <Button variant="primary" disabled={adding || !addFirst.trim() || !addLast.trim() || !addDni.trim()}>
+                  {adding ? "Agregando..." : "Agregar a la lista"}
+                </Button>
+              </div>
+            </form>
+            <div className="hr" />
+            {loading && <p style={{ color: "var(--muted)" }}>Cargando lista...</p>}
+            {err && (
+              <div className="notice error">
+                <div style={{ fontWeight: 700, marginBottom: 6 }}>Error</div>
+                <div className="mono">{err}</div>
+              </div>
+            )}
+            {!loading && !err && filtered.length === 0 && (
+              <p style={{ color: "var(--muted)" }}>
+                {search ? "No se encontraron resultados." : "No hay personas en la lista todavía."}
+              </p>
+            )}
+            {filtered.length > 0 && (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                      <th style={thStyle}>#</th>
+                      <th style={thStyle}>Nombre</th>
+                      <th style={thStyle}>Apellido</th>
+                      <th style={thStyle}>DNI</th>
+                      <th style={thStyle}>Agregado por</th>
+                      <th style={{ ...thStyle, textAlign: "center" }}>Estado</th>
+                      <th style={{ ...thStyle, textAlign: "center" }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((p, i) => (
+                      <tr
+                        key={p.orderId}
                         style={{
-                          background: p.scanned ? "rgba(34,197,94,.85)" : "rgba(255,255,255,.1)",
-                          color: p.scanned ? "#fff" : "var(--muted)",
-                          border: p.scanned ? "1px solid rgba(34,197,94,.5)" : "1px solid var(--border)",
-                          borderRadius: 8,
-                          padding: "4px 14px",
-                          fontSize: 13,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                          transition: "all .2s",
+                          borderBottom: "1px solid var(--border)",
+                          background: p.scanned ? "rgba(34,197,94,.12)" : "transparent",
+                          transition: "background .2s",
                         }}
                       >
-                        {toggling === p.orderId ? "..." : p.scanned ? "✓ Pasó" : "Marcar"}
-                      </button>
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: "center" }}>
-                      <button
-                        type="button"
-                        onClick={() => { if (window.confirm(`¿Eliminar a ${p.firstName} ${p.lastName} de la lista?`)) removePerson(p.orderId); }}
-                        disabled={deleting === p.orderId}
-                        style={{
-                          background: "transparent",
-                          color: "#e03131",
-                          border: "1px solid rgba(224,49,49,.3)",
-                          borderRadius: 8,
-                          padding: "4px 10px",
-                          fontSize: 12,
-                          cursor: "pointer",
-                        }}
-                      >
-                        {deleting === p.orderId ? "..." : "✕"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <td style={tdStyle} className="mono">
+                          {i + 1}
+                        </td>
+                        <td style={{ ...tdStyle, textDecoration: p.scanned ? "line-through" : "none", opacity: p.scanned ? 0.6 : 1 }}>
+                          {p.firstName}
+                        </td>
+                        <td style={{ ...tdStyle, textDecoration: p.scanned ? "line-through" : "none", opacity: p.scanned ? 0.6 : 1 }}>
+                          {p.lastName}
+                        </td>
+                        <td style={tdStyle} className="mono">
+                          {p.dni}
+                        </td>
+                        <td style={tdStyle}>
+                          <span style={{ fontSize: 12, color: "var(--muted)" }}>{p.addedBy || "—"}</span>
+                        </td>
+                        <td style={{ ...tdStyle, textAlign: "center" }}>
+                          <button
+                            type="button"
+                            onClick={() => toggleCheck(p.orderId)}
+                            disabled={toggling === p.orderId}
+                            style={{
+                              background: p.scanned ? "rgba(34,197,94,.85)" : "rgba(255,255,255,.1)",
+                              color: p.scanned ? "#fff" : "var(--muted)",
+                              border: p.scanned ? "1px solid rgba(34,197,94,.5)" : "1px solid var(--border)",
+                              borderRadius: 8,
+                              padding: "4px 14px",
+                              fontSize: 13,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              transition: "all .2s",
+                            }}
+                          >
+                            {toggling === p.orderId ? "..." : p.scanned ? "✓ Pasó" : "Marcar"}
+                          </button>
+                        </td>
+                        <td style={{ ...tdStyle, textAlign: "center" }}>
+                          <button
+                            type="button"
+                            onClick={() => { if (window.confirm(`¿Eliminar a ${p.firstName} ${p.lastName} de la lista?`)) removePerson(p.orderId); }}
+                            disabled={deleting === p.orderId}
+                            style={{
+                              background: "transparent",
+                              color: "#e03131",
+                              border: "1px solid rgba(224,49,49,.3)",
+                              borderRadius: 8,
+                              padding: "4px 10px",
+                              fontSize: 12,
+                              cursor: "pointer",
+                            }}
+                          >
+                            {deleting === p.orderId ? "..." : "✕"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
         )}
       </Card>
     </div>
