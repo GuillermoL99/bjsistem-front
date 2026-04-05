@@ -70,51 +70,48 @@ function ListaPage() {
   return (
     <div className="container" style={{ marginTop: 32, marginBottom: 32 }}>
       <div className="card">
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
-          <div>
-            <h2 style={{ margin: 0, fontSize: 22 }}>Lista Free</h2>
-            <p style={{ margin: "6px 0 0", color: "var(--muted)", lineHeight: 1.55 }}>
-              Personas agregadas manualmente al sistema.
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
-              <input
-                className="input"
-                name="nombre"
-                placeholder="Nombre"
-                value={form.nombre}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                style={{ minWidth: 120 }}
-              />
-              <input
-                className="input"
-                name="apellido"
-                placeholder="Apellido"
-                value={form.apellido}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                style={{ minWidth: 120 }}
-              />
-              <input
-                className="input"
-                name="dni"
-                placeholder="DNI"
-                value={form.dni}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                style={{ minWidth: 100 }}
-              />
-              <button className="btn btnPrimary" type="submit" disabled={loading} style={{ minWidth: 120 }}>
-                {loading ? "Agregando..." : "Agregar a la lista"}
-              </button>
-            </form>
-          </div>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 22 }}>Lista Free</h2>
+          <p style={{ margin: "6px 0 0", color: "var(--muted)", lineHeight: 1.55 }}>
+            Personas agregadas manualmente al sistema.
+          </p>
         </div>
+        <div className="hr" />
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>
+          <input
+            className="input"
+            name="nombre"
+            placeholder="Nombre"
+            value={form.nombre}
+            onChange={handleChange}
+            required
+            disabled={loading}
+            style={{ flex: 1, minWidth: 120 }}
+          />
+          <input
+            className="input"
+            name="apellido"
+            placeholder="Apellido"
+            value={form.apellido}
+            onChange={handleChange}
+            required
+            disabled={loading}
+            style={{ flex: 1, minWidth: 120 }}
+          />
+          <input
+            className="input"
+            name="dni"
+            placeholder="DNI"
+            value={form.dni}
+            onChange={handleChange}
+            required
+            disabled={loading}
+            style={{ flex: 1, minWidth: 100 }}
+          />
+          <button className="btn btnPrimary" type="submit" disabled={loading} style={{ minWidth: 120 }}>
+            {loading ? "Agregando..." : "Agregar a la lista"}
+          </button>
+        </form>
         <div className="hr" />
         <div>
           <input
