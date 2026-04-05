@@ -152,10 +152,38 @@ export default function MultiListPage() {
               )}
             </Card>
           );
+
         })
       await loadLists();
     } catch (e) {
       setErr(e?.data?.error || "toggle_failed");
+    }
+  }
+
+  // --- CORRECCIÓN DE ASYNC ---
+  async function removePerson(listId, personId) {
+    setAdding(listId + ":" + personId);
+    setErr("");
+    try {
+      await apiFetch(`/admin/guest-lists/${listId}/person/${personId}`, { method: "DELETE" });
+      await loadLists();
+    } catch (e) {
+      setErr(e?.data?.error || "remove_failed");
+    } finally {
+      setAdding("");
+    }
+  }
+
+  async function toggleCheck(listId, personId) {
+    setAdding(listId + ":" + personId);
+    setErr("");
+    try {
+      await apiFetch(`/admin/guest-lists/${listId}/person/${personId}/toggle`, { method: "POST" });
+      await loadLists();
+    } catch (e) {
+      setErr(e?.data?.error || "toggle_failed");
+    } finally {
+      setAdding("");
     }
   }
 
