@@ -69,7 +69,7 @@ function ListaPage() {
 
   return (
     <div className="container" style={{ marginTop: 32, marginBottom: 32 }}>
-      <div className="card">
+      <div className="card" style={{ width: "100%", maxWidth: "100%" }}>
         <h2 style={{ marginBottom: 8 }}>Lista Free</h2>
         <form
           onSubmit={handleSubmit}
