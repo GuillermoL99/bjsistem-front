@@ -34,7 +34,7 @@ const RESULT_CONFIG = {
   wrong_date: {
     border: "rgba(239,68,68,.4)",
     bg: "rgba(239,68,68,.08)",
-    title: "❌ Fecha incorrecta",
+    title: "❌ Entrada no válida para hoy",
     color: "rgba(239,68,68,.9)",
   },
   server_error: {
