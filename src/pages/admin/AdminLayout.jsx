@@ -162,16 +162,7 @@ export default function AdminLayout() {
                 >
                   Escanear
                 </Link>
-                <Link
-                  className={
-                    location.pathname.startsWith("/admin/list")
-                      ? "adminLink active"
-                      : "adminLink"
-                  }
-                  to="/admin/list"
-                >
-                  Lista
-                </Link>
+                {/* Lista eliminada para STAFF */}
               </>
             )}
 
